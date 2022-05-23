@@ -74,7 +74,7 @@ class userDB:
         self.gameResult = gameResult     
         dbConnectObject = sqlite3.connect('game.db')
         dbCursorObject = dbConnectObject.cursor()
-        print("Updating DB . .")
+        #Updating Wins and losses to database
         if gameResult == 'win':
             updateWinsQuery = f"UPDATE users SET usercoins = ({db.userCoins} + {d.reward}), userwins = ({db.userWins + 1}) WHERE username = '{userNameGet}'"
             dbCursorObject.execute(updateWinsQuery)    
@@ -85,7 +85,7 @@ class userDB:
             pass     
         dbConnectObject.commit()
         dbConnectObject.close()
-    def updateUserlevel(self):
+    def updateUserlevel(self): # Updating user level
         db.userValidation()
         dbConnectObject = sqlite3.connect('game.db')
         dbCursorObject = dbConnectObject.cursor()
@@ -114,7 +114,7 @@ class userDB:
         dbConnectObject.commit()
         dbConnectObject.close()
         
-db = userDB()    #### Initialising userDB class
+db = userDB()    # Initialising userDB class
 
 def clear():
     userNumGuess.delete(0, "end")
@@ -137,7 +137,6 @@ def gameStatusScreen(res):
             updateProfile()
             clearResLabel()
         except NameError as err:
-            # print(f"Name Error: {err},\n resLabelReTry is not created to be deleted.")
             pass
     else:
         try:
@@ -156,7 +155,6 @@ def userGuessSubmit():
         userEntry = userNumGuess.get()
         userNum = int(userNumGuess.get())
         print(f"User Entry: {userNum}")
-        # print(f"Winning Num: {d.num_set}")
         if d.num_set == userNum:
             gameStatusScreen('WIN')           
         else:
@@ -174,7 +172,7 @@ def userGuessSubmit():
         except:
             pass
 
-###### Play Screen ######
+#A frame for the Play Screen
 playScreen = tk.Frame(root, height = 400, width = 400, bg = '#213A5C')
 def playScreenFrame():
     playScreen.grid(column = 2, row = 1, columnspan = 4, rowspan = 9, sticky = 'NEWS')
@@ -185,7 +183,7 @@ def playScreenFrame():
     userPlay = tk.Label(playScreen, text = userPlayStr, font = 'Raleway 12', bg = '#213A5C', fg = "white")
     userPlay.grid(column = 0, row = 3, columnspan = 4)
 
-####### User Name submit Function ######
+# User Name Submit Function
 def userNameSubmit():
     global userNameGet
     userNameGet = loginEntry.get()
@@ -198,9 +196,8 @@ def userNameSubmit():
     playScreenFrame()
     userProfileFrame()
     diffSelectFrame()
-    # root.after(10, userProfileFrame)
     
-######Login Screen Title Frame######    
+# Login Screen Title Frame
 loginScreenTitle = tk.Frame(root, bg = 'black')
 loginScreenTitle.grid(column = 2, row = 0, columnspan = 6, sticky = 'NEWS')
 loginScreenTitle.columnconfigure(0, weight = 1)
@@ -208,7 +205,7 @@ loginScreenTitle.rowconfigure(0, weight = 1)
 loginScreenLabel = tk.Label(loginScreenTitle, text = 'Number Guessing Game', bg = 'black', fg = 'white', font = ('Raleway 24 bold'))
 loginScreenLabel.grid(column = 0, row = 0)
 
-######In game Title######
+# In game Title
 def inGameScreenTitleFrame():
     inGameScreenTitle = tk.Frame(root, bg = 'black')
     inGameScreenTitle.grid(column = 2, row = 0, columnspan = 4, sticky = 'NEWS')
@@ -217,7 +214,7 @@ def inGameScreenTitleFrame():
     userWelcome = tk.Label(inGameScreenTitle, text = f"Welcome, {db.userName}", font = 'Raleway 22 bold', bg = 'black', fg = "white")
     userWelcome.grid(column = 0, row = 0, columnspan = 4)
 
-####### Login Screen #######
+# Login Screen
 loginScreen = tk.Frame(root, height = 400, width = 600, bg = '#213A5C')
 loginScreen.grid(column = 2, row = 1, columnspan = 6, rowspan = 9, sticky = 'NEWS')
 loginScreen.grid_propagate (False)  # Stop frame from shrinking
@@ -233,10 +230,9 @@ loginEntry.grid(column = 0, row = 2, columnspan = 6)
 loginSubmit = tk.Button(loginScreen, text = "Submit", command = userNameSubmit , bg = '#213A5C', fg = "white")
 loginSubmit.grid(column = 0, row = 3, columnspan = 6)
 
-###### Play Game Function ######
+# Play Game Function
 guessScreen = tk.Frame(root, height = 400, width = 400, bg = '#213A5C')
 def guessFunc():
-    print(f"Winning Num: {d.num_set}")
     guessScreen.grid(column = 2, row = 1, columnspan = 4, rowspan = 9, sticky = 'NEWS')
     guessScreen.grid_propagate (False)   # Stop frame from shrinking
     guessScreen.columnconfigure([0,3], weight = 1)
@@ -328,15 +324,14 @@ def userProfileFrame():
     labelStatsLevel = tk.Label(userFrame, text = db.userLevel, bg = '#000033', fg = 'white', font = 'Raleway 12')
     labelStatsLevel.grid(column = 1, row = 5, sticky = 'W', padx = 10)
 
-###### Frame for Difficulty Selection#############
+#A Frame for Difficulty Selection
 def delResLabels():
     try:
         if userWin.winfo_exists():
             userWin.grid_forget()
         if userLost.winfo_exists():
             userLost.grid_forget()
-    except NameError as err:
-        # print(err) 
+    except NameError as err: 
         pass
 
 def diffSelectFrame():
