@@ -32,7 +32,7 @@ def userValidation(userName):
     # if userRes is None:
     #     db.createNewUser()
 def userProfile(userName):
-    global userCoins, userWins, userLost, userLevel
+    global playerID, userCoins, userWins, userLost, userLevel
     dbConnectObject = sqlite3.connect('game.db')
     dbCursorObject = dbConnectObject.cursor()
     userQuery = f"SELECT playerID, username, usercoins, userwins, userlost, userlevel from users WHERE username = '{userName}'"
@@ -52,7 +52,7 @@ def updateUser(userName, reward, gameResult):
     dbCursorObject = dbConnectObject.cursor()
     #Updating Wins and losses to database
     if gameResult == 'win':
-        updateWinsQuery = f"UPDATE users SET usercoins = ({userCoins} + {reward}), userwins = ({userWins + 1}) WHERE username = '{userNameGet}'"
+        updateWinsQuery = f"UPDATE users SET usercoins = ({userCoins} + {reward}), userwins = ({userWins + 1}) WHERE username = '{userName}'"
         dbCursorObject.execute(updateWinsQuery)    
     elif gameResult == 'lost':
         updateLostQuery = f"UPDATE users SET userlost = ({userWins} + 1) WHERE username = '{userName}'"

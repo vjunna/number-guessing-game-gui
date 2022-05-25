@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import sqlite3
 import random
+import gamedb
 
 root = tk.Tk()
 root.geometry("800x500")
@@ -24,98 +25,6 @@ class difficulty:
         self.count = 9
 d = difficulty() #Initializing class for Difficulty levels
 
-class userDB: 
-    def createGameDB(self):
-        try:
-            dbConnectObject = sqlite3.connect('game.db')
-            dbCursorObject = dbConnectObject.cursor()
-            usersTable = 'CREATE TABLE  IF NOT EXISTS users (playerID INTEGER PRIMARY KEY NOT NULL, username str NOT NULL UNIQUE, usercoins INTEGER, userwins INTEGER, userlost INTEGER, userlevel INTEGER);'
-            dbCursorObject.execute(usersTable)
-            dbConnectObject.commit()
-            dbConnectObject.close()
-        except ValueError as err:
-            # print('err')
-            pass
-        finally:
-            if dbConnectObject:
-               dbConnectObject.close()            
-    def createNewUser(self):
-        dbConnectObject = sqlite3.connect('game.db')
-        dbCursorObject = dbConnectObject.cursor()
-        userCreate = f"INSERT INTO users (username, usercoins, userwins, userlost, userlevel) VALUES ('{userNameGet}', 50, 0, 0, 0);"
-        dbCursorObject.execute(userCreate)
-        dbConnectObject.commit()
-        dbConnectObject.close()    
-    def userValidation(self):      
-        dbConnectObject = sqlite3.connect('game.db')
-        dbCursorObject = dbConnectObject.cursor()
-        print(userNameGet)
-        userQuery = f"SELECT * from users WHERE username = '{userNameGet}'"
-        dbCursorObject.execute(userQuery)
-        userRes = dbCursorObject.fetchone()
-        dbConnectObject.close()
-        if userRes is None:
-            db.createNewUser()
-    def userProfile(self):
-        dbConnectObject = sqlite3.connect('game.db')
-        dbCursorObject = dbConnectObject.cursor()
-        userQuery = f"SELECT playerID, username, usercoins, userwins, userlost, userlevel from users WHERE username = '{userNameGet}'"
-        dbCursorObject.execute(userQuery)
-        userRes = dbCursorObject.fetchall()
-        for i in userRes:
-            self.playerID = i[0]
-            self.userName = i[1]
-            self.userCoins = i[2]
-            self.userWins = i[3]
-            self.userLost = i[4]
-            self.userLevel = i[5]
-        dbConnectObject.close()
-    def updateUser(self, gameResult):
-        self.gameResult = gameResult     
-        dbConnectObject = sqlite3.connect('game.db')
-        dbCursorObject = dbConnectObject.cursor()
-        #Updating Wins and losses to database
-        if gameResult == 'win':
-            updateWinsQuery = f"UPDATE users SET usercoins = ({db.userCoins} + {d.reward}), userwins = ({db.userWins + 1}) WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(updateWinsQuery)    
-        elif gameResult == 'lost':
-            updateLostQuery = f"UPDATE users SET userlost = ({db.userWins} + 1) WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(updateLostQuery)
-        else: 
-            pass     
-        dbConnectObject.commit()
-        dbConnectObject.close()
-    def updateUserlevel(self): # Updating user level
-        db.userValidation()
-        dbConnectObject = sqlite3.connect('game.db')
-        dbCursorObject = dbConnectObject.cursor()
-        if db.userCoins > 55 and db.userCoins <= 70:
-            l1 = updateLevelQuery = f"UPDATE users SET userlevel = 1 WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(l1)
-        elif db.userCoins > 80 and db.userCoins <= 100:
-            l2 = updateLevelQuery = f"UPDATE users SET userlevel = 2 WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(l2)
-        elif db.userCoins > 100 and db.userCoins <= 125:
-            l3 = updateLevelQuery = f"UPDATE users SET userlevel = 3 WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(l3)
-        elif db.userCoins > 125 and db.userCoins <= 175:
-            l4 = updateLevelQuery = f"UPDATE users SET userlevel = 4 WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(l4)
-        elif db.userCoins > 175 and db.userCoins <= 250:
-            l5 = updateLevelQuery = f"UPDATE users SET userlevel = 5 WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(l5)
-        elif db.userCoins > 250 and db.userCoins <= 350:
-            l6 = updateLevelQuery = f"UPDATE users SET userlevel = 6 WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(l6)
-        else:
-            l0 = updateLevelQuery = f"UPDATE users SET userlevel = 0 WHERE username = '{userNameGet}'"
-            dbCursorObject.execute(l0)
-
-        dbConnectObject.commit()
-        dbConnectObject.close()
-        
-db = userDB()    # Initialising userDB class
-
 def clear():
     userNumGuess.delete(0, "end")
 def clearResLabel():
@@ -133,7 +42,7 @@ def gameStatusScreen(res):
             print("win")
             userWin = tk.Label(guessScreen, text = 'You won the game ! ! ! \n\n\n Select difficulty level to play again', bg = '#213A5C', fg = 'white', font = 'Raleway 14 bold')
             userWin.grid(column = 0, row = 3, columnspan = 4)
-            db.updateUser('win')
+            gamedb.updateUser('win')
             updateProfile()
             clearResLabel()
         except NameError as err:
@@ -145,7 +54,7 @@ def gameStatusScreen(res):
             userLost = tk.Label(guessScreen, text = 'Ahhh! You Lost!!! \n\n Select difficulty level to try \nyour luck again', bg = '#213A5C', fg = 'white', font = 'Raleway 14 bold')
             userLost.grid(column = 0, row = 3, columnspan = 4)
             clearResLabel()
-            db.updateUser('lost')
+            gamedb.updateUser('lost')
             updateProfile()
             print("Lost")
         except:
@@ -185,11 +94,11 @@ def playScreenFrame():
 
 # User Name Submit Function
 def userNameSubmit():
-    global userNameGet
-    userNameGet = loginEntry.get()
-    db.createGameDB()
-    db.userValidation()
-    db.userProfile()
+    global userName
+    userName = loginEntry.get()
+    gamedb.createGameDB()
+    gamedb.userValidation()
+    gamedb.userProfile()
     loginScreen.grid_forget()
     loginScreenTitle.grid_forget()
     inGameScreenTitleFrame()
@@ -211,7 +120,7 @@ def inGameScreenTitleFrame():
     inGameScreenTitle.grid(column = 2, row = 0, columnspan = 4, sticky = 'NEWS')
     inGameScreenTitle.columnconfigure(0, weight = 1)
     inGameScreenTitle.rowconfigure(0, weight = 1)
-    userWelcome = tk.Label(inGameScreenTitle, text = f"Welcome, {db.userName}", font = 'Raleway 22 bold', bg = 'black', fg = "white")
+    userWelcome = tk.Label(inGameScreenTitle, text = f"Welcome, {userName}", font = 'Raleway 22 bold', bg = 'black', fg = "white")
     userWelcome.grid(column = 0, row = 0, columnspan = 4)
 
 # Login Screen
@@ -272,19 +181,19 @@ def rulesFrameFunc():
 rulesFrameFunc() # Initializing frame for rules
 
 def updateProfile():
-    db.userProfile()        
+    gamedb.userProfile()        
     # for i in range(len(profileStats)):
     #     statsLabel = 'labelStats' + pLabelName[i]
     #     statsLabel.config(text = f'{profileStats[i]}')
     # profileStats = [db.userName, db.userCoins, db.userWins, db.userLost, db.userLevel]
     # profileLabels = ['Username :', 'Coins :', 'Wins :', 'Lost :', 'Level :']
     
-    labelStatsUsername.config(text = db.userName)
-    labelStatsCoins.config(text = db.userCoins)
-    labelStatsWins.config(text = db.userWins)
-    labelStatsLost.config(text = db.userLost)
-    labelStatsLevel.config(text = db.userLevel)
-    db.updateUserlevel() 
+    labelStatsUsername.config(text = userName)
+    labelStatsCoins.config(text = gamedb.userCoins)
+    labelStatsWins.config(text = gamedb.userWins)
+    labelStatsLost.config(text = gamedb.userLost)
+    labelStatsLevel.config(text = gamedb.userLevel)
+    gamedb.updateUserlevel() 
 
 ###### User Profile Frame #######
 def createProfileLabels(): 
@@ -309,19 +218,19 @@ def userProfileFrame():
     playerLabel.grid(column = 0, row = 0, columnspan = 2) 
     profileLabels = ['Username :', 'Coins :', 'Wins :', 'Lost :', 'Level :']
     pLabelName = ['Username', 'Coins', 'Wins', 'Lost', 'Level']
-    profileStats = [db.userName, db.userCoins, db.userWins, db.userLost, db.userLevel]
+    profileStats = [gamedb.userName, gamedb.userCoins, gamedb.userWins, gamedb.userLost, gamedb.userLevel]
     createProfileLabels()
     
     global labelStatsUsername, labelStatsCoins, labelStatsWins, labelStatsLost, labelStatsLevel
-    labelStatsUsername = tk.Label(userFrame, text = db.userName, bg = '#000033', fg = 'white', font = 'Raleway 12')
+    labelStatsUsername = tk.Label(userFrame, text = gamedb.userName, bg = '#000033', fg = 'white', font = 'Raleway 12')
     labelStatsUsername.grid(column = 1, row = 1, sticky = 'W', padx = 10) 
-    labelStatsCoins = tk.Label(userFrame, text = db.userCoins, bg = '#000033', fg = 'white', font = 'Raleway 12')
+    labelStatsCoins = tk.Label(userFrame, text = gamedb.userCoins, bg = '#000033', fg = 'white', font = 'Raleway 12')
     labelStatsCoins.grid(column = 1, row = 2, sticky = 'W', padx = 10)
-    labelStatsWins = tk.Label(userFrame, text = db.userWins, bg = '#000033', fg = 'white', font = 'Raleway 12')
+    labelStatsWins = tk.Label(userFrame, text = gamedb.userWins, bg = '#000033', fg = 'white', font = 'Raleway 12')
     labelStatsWins.grid(column = 1, row = 3, sticky = 'W', padx = 10)
-    labelStatsLost = tk.Label(userFrame, text = db.userLost, bg = '#000033', fg = 'white', font = 'Raleway 12')
+    labelStatsLost = tk.Label(userFrame, text = gamedb.userLost, bg = '#000033', fg = 'white', font = 'Raleway 12')
     labelStatsLost.grid(column = 1, row = 4, sticky = 'W', padx = 10)
-    labelStatsLevel = tk.Label(userFrame, text = db.userLevel, bg = '#000033', fg = 'white', font = 'Raleway 12')
+    labelStatsLevel = tk.Label(userFrame, text = gamedb.userLevel, bg = '#000033', fg = 'white', font = 'Raleway 12')
     labelStatsLevel.grid(column = 1, row = 5, sticky = 'W', padx = 10)
 
 #A Frame for Difficulty Selection
