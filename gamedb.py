@@ -22,6 +22,7 @@ def createNewUser(userName):
     dbConnectObject.commit()
     dbConnectObject.close()    
 def userValidation(userName):      
+    global userRes
     dbConnectObject = sqlite3.connect('game.db')
     dbCursorObject = dbConnectObject.cursor()
     print(userName)
@@ -31,13 +32,15 @@ def userValidation(userName):
     dbConnectObject.close()
     # if userRes is None:
     #     db.createNewUser()
-def userProfile(userName):
+def userProfileDB(userName):    
     global playerID, userCoins, userWins, userLost, userLevel
+    # self.playerID = playerID
     dbConnectObject = sqlite3.connect('game.db')
     dbCursorObject = dbConnectObject.cursor()
     userQuery = f"SELECT playerID, username, usercoins, userwins, userlost, userlevel from users WHERE username = '{userName}'"
     dbCursorObject.execute(userQuery)
     userRes = dbCursorObject.fetchall()
+    print(userRes)
     for i in userRes:
         playerID = i[0]
         userName = i[1]
@@ -46,7 +49,8 @@ def userProfile(userName):
         userLost = i[4]
         userLevel = i[5]
     dbConnectObject.close()
-def updateUser(userName, reward, gameResult):
+    # print(playerID, userCoins, userWins, userLost, userLevel)
+def updateUserDB(userName, reward, gameResult):
     # self.gameResult = gameResult     
     dbConnectObject = sqlite3.connect('game.db')
     dbCursorObject = dbConnectObject.cursor()
