@@ -25,6 +25,6 @@ graph TD;
     Tries -->Retry;
 
     Win -->Start;
-    Retry -->7_Tries;
+    Retry -->Tries;
     Retry -->Lost;
     Lost -->Start;
